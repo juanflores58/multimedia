@@ -45,11 +45,20 @@
         let cards = [];
         let flippedCards = [];
         let matchedPairs = 0;
-        
-        fetch("https://pokeapi.co/api/v2/pokemon?limit=10")
+
+        // Obtener 10 Pokémon aleatorios
+        fetch("https://pokeapi.co/api/v2/pokemon?limit=1000")
             .then(response => response.json())
             .then(data => {
-                let promises = data.results.map(pokemon => fetch(pokemon.url).then(res => res.json()));
+                let selectedPokemon = [];
+                while (selectedPokemon.length < 10) {
+                    let randomIndex = Math.floor(Math.random() * data.results.length);
+                    let chosen = data.results[randomIndex];
+                    if (!selectedPokemon.includes(chosen)) {
+                        selectedPokemon.push(chosen);
+                    }
+                }
+                let promises = selectedPokemon.map(pokemon => fetch(pokemon.url).then(res => res.json()));
                 Promise.all(promises).then(pokemons => {
                     pokemons.forEach(pokemon => {
                         pokemonImages.push(pokemon.sprites.front_default);
@@ -64,6 +73,7 @@
             
             const gameBoard = document.getElementById("gameBoard");
             gameBoard.innerHTML = "";
+            cards = [];
             
             tempImages.forEach((imgSrc, index) => {
                 const card = document.createElement("div");
